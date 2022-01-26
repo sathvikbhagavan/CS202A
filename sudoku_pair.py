@@ -71,12 +71,14 @@ def get_inter_clauses(clauses_1, clauses_2):
     for i in range(1, 10):
         for j in range(1, 10):
             for k in range(1, 10):
-                clauses.append([-1*get_pos()])            
+                clauses.append([-1*get_pos(0, i, j, k), -1*get_pos(1, i, j, k)])
+
+    return clauses            
 
 
 
-clauses_1 = get_clauses()
-clauses_2 = get_clauses()
+clauses_1 = get_clauses(0)
+clauses_2 = get_clauses(1)
 
 grid_1  = [[0, 2, 0, 0, 0, 0, 0, 3, 0],
         [0, 0, 0, 6, 0, 1, 0, 0, 0],
@@ -89,40 +91,53 @@ grid_1  = [[0, 2, 0, 0, 0, 0, 0, 3, 0],
         [0, 1, 0, 0, 0, 0, 0, 9, 0]]
 
 
-grid_2  = [[0, 2, 0, 0, 0, 0, 0, 3, 0],
-        [0, 0, 0, 6, 0, 1, 0, 0, 0],
-        [0, 6, 8, 2, 0, 0, 0, 0, 5],
-        [0, 0, 9, 0, 0, 8, 3, 0, 0],
-        [0, 4, 6, 0, 0, 0, 7, 5, 0],
-        [0, 0, 1, 3, 0, 0, 4, 0, 0],
-        [9, 0, 0, 0, 0, 7, 5, 1, 0],
-        [0, 0, 0, 1, 0, 4, 0, 0, 0],
-        [0, 1, 0, 0, 0, 0, 0, 9, 0]]
+grid_2  = [[0, 3, 0, 0, 0, 0, 0, 4, 0],
+        [0, 0, 0, 7, 0, 2, 0, 0, 0],
+        [0, 7, 9, 3, 0, 0, 0, 0, 6],
+        [0, 0, 1, 0, 0, 9, 4, 0, 0],
+        [0, 5, 7, 0, 0, 0, 8, 6, 0],
+        [0, 0, 2, 4, 0, 0, 5, 0, 0],
+        [1, 0, 0, 0, 0, 8, 6, 2, 0],
+        [0, 0, 0, 2, 0, 5, 0, 0, 0],
+        [0, 2, 0, 0, 0, 0, 0, 1, 0]]
 
 
 for i in range(1, 10):
     for j in range(1, 10):
         if grid_1[i-1][j-1] != 0:
-            clauses_1.append([get_pos(0, i, j, grid[i-1][j-1])])
+            clauses_1.append([get_pos(0, i, j, grid_1[i-1][j-1])])
         if grid_2[i-1][j-1] != 0:
-            clauses_2.append([get_pos(1, i, j, grid[i-1][j-1])])
+            clauses_2.append([get_pos(1, i, j, grid_2[i-1][j-1])])
         
 
+
+clauses = get_inter_clauses(clauses_1, clauses_2)
 m = Minisat22(bootstrap_with=clauses)
 m.solve()
-# print(m.get_model())
 
-solution = grid.copy()
+solution_1 = grid_1.copy()
+solution_2 = grid_2.copy()
 
 for i in m.get_model():
-    # print(i)
-    if i > 0:
-        num = i
+    if i > 0 and i // 1000 == 0:
+        num = i%1000
         x = num//100
         num = num % 100
         y = num//10
         num = num % 10
-        solution[x-1][y-1] = num
+        solution_1[x-1][y-1] = num
+    elif i > 0 and i // 1000 == 1:
+        num = i%1000
+        x = num//100
+        num = num % 100
+        y = num//10
+        num = num % 10
+        solution_2[x-1][y-1] = num
 
-for k in solution:
+for k in solution_1:
+    print(k)
+
+print('--------------------------------')
+
+for k in solution_2:
     print(k)
