@@ -76,6 +76,43 @@ def get_inter_clauses(clauses_1, clauses_2):
     return clauses            
 
 
+def validate(solution):
+
+
+    # row validation
+    for i in range(9):
+        x = [False]*10
+        for j in range(9):
+            if not x[solution[i][j]]:
+                x[solution[i][j]] = True
+            else:
+                return False
+
+    
+    # column validation
+    for i in range(9):
+        x = [False]*10
+        for j in range(9):
+            if not x[solution[j][i]]:
+                x[solution[j][i]] = True
+            else:
+                return False
+    
+
+    # sub grid validation
+    for i in [0, 1, 2]:
+        for j in [0, 1, 2]:
+            x = [False]*10
+            for p in range(3*i, 3*i+3):
+                for q in range(3*j, 3*j+3):
+                    if not x[solution[p][q]]:
+                        x[solution[p][q]] = True
+                    else:
+                        return False
+    
+    return True
+
+
 
 clauses_1 = get_clauses(0)
 clauses_2 = get_clauses(1)
@@ -133,6 +170,10 @@ for i in m.get_model():
         y = num//10
         num = num % 10
         solution_2[x-1][y-1] = num
+
+
+print(validate(solution_1))
+print(validate(solution_2))
 
 for k in solution_1:
     print(k)
