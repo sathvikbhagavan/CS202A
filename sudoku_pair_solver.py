@@ -40,26 +40,28 @@ class Clauses:
         row_clauses = []
         for i in range(1, self.kdim**2+1):
             for j in range(1, self.kdim**2+1):
-                for i2  in range(1, self.kdim**2+1):
+                for i2  in range(i+1, self.kdim**2+1):
+                # for i2  in range(1, self.kdim**2+1):
                     if i != i2:
                         for k in range(1, self.kdim**2+1):
                             row_clauses.append([-1*self.encode(g, i, j, k), -1*self.encode(g, i2, j, k)])
         
-        row_clauses = list(set([tuple(sorted(i)) for i in row_clauses]))
-        row_clauses = [list(i) for i in row_clauses]
+        # row_clauses = list(set([tuple(sorted(i)) for i in row_clauses]))
+        # row_clauses = [list(i) for i in row_clauses]
         clauses += row_clauses
 
 
         col_clauses = []
         for i in range(1, self.kdim**2+1):
             for j in range(1, self.kdim**2+1):
-                for j2  in range(1, self.kdim**2+1):
+                for j2  in range(j+1, self.kdim**2+1):
+                # for j2  in range(1, self.kdim**2+1):
                     if j != j2:
                         for k in range(1, self.kdim**2+1):
                             col_clauses.append([-1*self.encode(g, i, j, k), -1*self.encode(g, i, j2, k)])
                 
-        col_clauses = list(set([tuple(sorted(i)) for i in col_clauses]))
-        col_clauses = [list(i) for i in col_clauses]
+        # col_clauses = list(set([tuple(sorted(i)) for i in col_clauses]))
+        # col_clauses = [list(i) for i in col_clauses]
         clauses += col_clauses
 
 
@@ -69,13 +71,13 @@ class Clauses:
                 x, y  = self.get_subgrid(i, j)
                 for p in range(self.kdim*x+1, self.kdim*x+self.kdim+1):
                     for q in range(self.kdim*y+1, self.kdim*y+self.kdim+1):
-                        if p != i or q != j:
+                        if p > i or q > j:
                             for k in range(1, self.kdim**2+1):
                                 subgrid_clauses.append([-1*self.encode(g, i, j, k), -1*self.encode(g, p, q, k)])
         
         
-        subgrid_clauses = list(set([tuple(sorted(i)) for i in subgrid_clauses]))
-        subgrid_clauses = [list(i) for i in subgrid_clauses]
+        # subgrid_clauses = list(set([tuple(sorted(i)) for i in subgrid_clauses]))
+        # subgrid_clauses = [list(i) for i in subgrid_clauses]
         clauses += subgrid_clauses
         return clauses
 
@@ -101,9 +103,9 @@ class Clauses:
 
     def get_clauses(self):
 
+        self.get_fixed_clauses()
         self.clauses_1 = self.get_individual_clauses(0)
         self.clauses_2 = self.get_individual_clauses(1)
-        self.get_fixed_clauses()
         self.get_inter_clauses()
         return self.clauses
 
@@ -113,6 +115,7 @@ class Solver(Clauses):
     def __init__(self, kdim, grid_1, grid_2):
         super().__init__(kdim, grid_1, grid_2)
         self.get_clauses()
+        print('Got all clauses')
         self.solver = Minisat22(bootstrap_with=self.clauses)
         self.solution = None
         self.solution_1 = copy.deepcopy(self.grid_1)
