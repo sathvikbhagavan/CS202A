@@ -2,6 +2,7 @@ from pysat.solvers import Minisat22
 import argparse
 import numpy
 import pandas as pd
+import copy
 
 ap = argparse.ArgumentParser()
 ap.add_argument('-k', '--kdim', help='Value of k')
@@ -162,8 +163,8 @@ m = Minisat22(bootstrap_with=clauses)
 m.solve()
 sol = m.get_model()
 
-solution_1 = grid_1.copy()
-solution_2 = grid_2.copy()
+solution_1 = copy.deepcopy(grid_1)
+solution_2 = copy.deepcopy(grid_2)
 
 
 for i in m.get_model():
