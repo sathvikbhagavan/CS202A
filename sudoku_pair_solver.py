@@ -1,7 +1,8 @@
 from pysat.solvers import Minisat22
 import copy
+import itertools
 
-class Clauses:
+class Solver:
     def __init__(self, kdim, grid_1, grid_2):
         self.kdim = kdim
         self.grid_1 = grid_1
@@ -9,7 +10,11 @@ class Clauses:
         self.clauses_1 = []
         self.clauses = []
         self.clauses_2 = []
-
+        self.clauses_ = None
+        self.solver = None
+        self.solution = None
+        self.solution_1 = copy.deepcopy(self.grid_1)
+        self.solution_2 = copy.deepcopy(self.grid_2)
     
     def encode(self, g, i, j, k):
         return (self.kdim**6)*g + (self.kdim**4)*(i-1) + (self.kdim**2)*(j-1) + k
@@ -29,62 +34,60 @@ class Clauses:
     
     def get_individual_clauses(self, g):
         clauses = []
+
+        # Each cell has atleast one number
+        individual_clauses_1 = []
         for i in range(1, self.kdim**2+1):
             for j in range(1, self.kdim**2+1):
-                clauses.append([self.encode(g, i, j, k) for k in range(1, self.kdim**2+1)])
+                individual_clause = []
+                for k in range(1, self.kdim**2+1):
+                    individual_clause.append(self.encode(g, i, j, k))
+                clauses.append(individual_clause)
+
+        
+        # Each cell has atmost one number
+        individual_clauses_2 = []
+        for i in range(1, self.kdim**2+1):
+            for j in range(1, self.kdim**2+1):
                 for k1 in range(1, self.kdim**2+1):
                     for k2 in range(k1+1, self.kdim**2+1):
                         clauses.append([-1*self.encode(g, i, j, k1), -1*self.encode(g, i, j, k2)])
-
         
+
+        # Each row has every number
         row_clauses = []
-        for i in range(1, self.kdim**2+1):
-            for j in range(1, self.kdim**2+1):
-                for i2  in range(i+1, self.kdim**2+1):
-                # for i2  in range(1, self.kdim**2+1):
-                    if i != i2:
-                        for k in range(1, self.kdim**2+1):
-                            row_clauses.append([-1*self.encode(g, i, j, k), -1*self.encode(g, i2, j, k)])
+        for j in range(1, self.kdim**2+1):
+            for i in range(1, self.kdim**2+1):
+                for i2 in range(i+1, self.kdim**2+1):
+                    for k in range(1, self.kdim**2+1):
+                        clauses.append([-1*self.encode(g, i, j, k), -1*self.encode(g, i2, j, k)])
         
-        # row_clauses = list(set([tuple(sorted(i)) for i in row_clauses]))
-        # row_clauses = [list(i) for i in row_clauses]
-        clauses += row_clauses
 
-
+        # Each column has every number
         col_clauses = []
         for i in range(1, self.kdim**2+1):
             for j in range(1, self.kdim**2+1):
                 for j2  in range(j+1, self.kdim**2+1):
-                # for j2  in range(1, self.kdim**2+1):
-                    if j != j2:
-                        for k in range(1, self.kdim**2+1):
-                            col_clauses.append([-1*self.encode(g, i, j, k), -1*self.encode(g, i, j2, k)])
-                
-        # col_clauses = list(set([tuple(sorted(i)) for i in col_clauses]))
-        # col_clauses = [list(i) for i in col_clauses]
-        clauses += col_clauses
+                    for k in range(1, self.kdim**2+1):
+                        clauses.append([-1*self.encode(g, i, j, k), -1*self.encode(g, i, j2, k)])
 
 
+        # Subgrids
         subgrid_clauses = []
-        for i in range(1, self.kdim**2+1):
-            for j in range(1, self.kdim**2+1):
-                x, y  = self.get_subgrid(i, j)
-                for p in range(self.kdim*x+1, self.kdim*x+self.kdim+1):
-                    for q in range(self.kdim*y+1, self.kdim*y+self.kdim+1):
-                        if p > i or q > j:
-                            for k in range(1, self.kdim**2+1):
-                                subgrid_clauses.append([-1*self.encode(g, i, j, k), -1*self.encode(g, p, q, k)])
+        for r in range(self.kdim):
+            for s in range(self.kdim):
+                for k in range(1, self.kdim**2+1):
+                    subgrid_clause = []
+                    for i in range(1, self.kdim+1):
+                        for j in range(1, self.kdim+1):
+                            subgrid_clause.append(self.encode(g, self.kdim*r+i, self.kdim*s+j, k))
+                    clauses.append(subgrid_clause)
         
-        
-        # subgrid_clauses = list(set([tuple(sorted(i)) for i in subgrid_clauses]))
-        # subgrid_clauses = [list(i) for i in subgrid_clauses]
-        clauses += subgrid_clauses
         return clauses
 
 
     def get_inter_clauses(self):
 
-        self.clauses = self.clauses_1 + self.clauses_2
         for i in range(1, self.kdim**2+1):
             for j in range(1, self.kdim**2+1):
                 for k in range(1, self.kdim**2+1):
@@ -97,33 +100,33 @@ class Clauses:
         for i in range(1, self.kdim**2+1):
             for j in range(1, self.kdim**2+1):
                 if self.grid_1[i-1][j-1] != 0:
-                    self.clauses_1.append([self.encode(0, i, j, self.grid_1[i-1][j-1])])
+                    self.clauses.append([self.encode(0, i, j, self.grid_1[i-1][j-1])])
                 if self.grid_2[i-1][j-1] != 0:
-                    self.clauses_2.append([self.encode(1, i, j, self.grid_2[i-1][j-1])])
+                    self.clauses.append([self.encode(1, i, j, self.grid_2[i-1][j-1])])
 
     def get_clauses(self):
 
-        self.get_fixed_clauses()
         self.clauses_1 = self.get_individual_clauses(0)
         self.clauses_2 = self.get_individual_clauses(1)
+        self.clauses = self.clauses_1 + self.clauses_2
         self.get_inter_clauses()
-        return self.clauses
+        self.clauses_= copy.deepcopy(self.clauses)
 
+        self.get_fixed_clauses()
+    
+    def get_clauses_updated(self):
 
-
-class Solver(Clauses):
-    def __init__(self, kdim, grid_1, grid_2):
-        super().__init__(kdim, grid_1, grid_2)
-        self.get_clauses()
-        print('Got all clauses')
-        self.solver = Minisat22(bootstrap_with=self.clauses)
-        self.solution = None
-        self.solution_1 = copy.deepcopy(self.grid_1)
-        self.solution_2 = copy.deepcopy(self.grid_2)
+        self.clauses = copy.deepcopy(self.clauses_)
+        self.get_fixed_clauses()
+        self.add_solution_clauses()
 
     def solve(self):
+        
+        self.solver = Minisat22(use_timer=True, bootstrap_with=self.clauses)
         self.solver.solve()
         self.solution = self.solver.get_model()
+        if self.solution is None:
+            return False
         for i in self.solution:
             if i > 0 and i <= (self.kdim**6):
                 x, y, num = self.decode(i)
@@ -132,15 +135,41 @@ class Solver(Clauses):
                 x, y, num = self.decode(i)
                 self.solution_2[x][y] = num
 
+        return True
+
+
+    def print_grid(self):
+
+        print('-*-'*self.kdim**2)
+        for k in self.grid_1:
+            print(k)
+        print('-*-'*self.kdim**2)
+        for k in self.grid_2:
+            print(k)
+        print('-*-'*self.kdim**2)
+        
+
     def print_solution(self):
         
+        print('-*-'*self.kdim**2)
         for k in self.solution_1:
             print(k)
-
-        print('--------------------------------')
-
+        print('-*-'*self.kdim**2)
         for k in self.solution_2:
             print(k)
+        print('-*-'*self.kdim**2)
+
+    def add_solution_clauses(self):
+
+        sol_clause = []
+        # clause_2 = []
+        for i in range(1, self.kdim**2+1):
+            for j in range(1, self.kdim**2+1):
+                sol_clause.append(-1*self.encode(0, i, j, self.solution_1[i-1][j-1]))
+                sol_clause.append(-1*self.encode(1, i, j, self.solution_2[i-1][j-1]))
+
+        self.clauses.append(sol_clause)
+        # print(f'The length of clauses are : {len(self.clauses)}\n')
 
     def _validate(self, i):
 
@@ -180,6 +209,13 @@ class Solver(Clauses):
         
         return True
 
+    def set_grid(self):
+
+        for i in range(1, self.kdim**2+1):
+            for j in range(1, self.kdim**2+1):
+                self.grid_1[i-1][j-1] = self.solution_1[i-1][j-1]
+                self.grid_2[i-1][j-1] = self.solution_2[i-1][j-1]
+
     def validate(self):
 
         first = self._validate(0)
@@ -194,3 +230,4 @@ class Solver(Clauses):
             print('Second solution is correct')
         else:
             print('Second solution is wrong')
+
