@@ -5,7 +5,9 @@ There are some prerequisites for running this code:  numpy, pandas, pysat
 ## Our versions:
 
 numpy 1.22.1
+
 pandas 1.4.0
+
 python-sat 0.1.7
 
 
