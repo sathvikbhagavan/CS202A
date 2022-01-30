@@ -1,9 +1,11 @@
 from pysat.solvers import Minisat22
 import copy
 import itertools
+import numpy as np
+import pandas as pd
 
 class Solver:
-    def __init__(self, kdim, grid_1, grid_2):
+    def __init__(self, kdim, grid_1, grid_2, file_name=None):
         self.kdim = kdim
         self.grid_1 = grid_1
         self.grid_2 = grid_2
@@ -15,6 +17,7 @@ class Solver:
         self.solution = None
         self.solution_1 = copy.deepcopy(self.grid_1)
         self.solution_2 = copy.deepcopy(self.grid_2)
+        self.file_name = file_name
     
     def encode(self, g, i, j, k):
         return (self.kdim**6)*g + (self.kdim**4)*(i-1) + (self.kdim**2)*(j-1) + k
@@ -140,9 +143,13 @@ class Solver:
 
     def print_grid(self):
 
+        print('Grid 1: ')
         print('-*-'*self.kdim**2)
         for k in self.grid_1:
             print(k)
+        print('-*-'*self.kdim**2)
+        print()
+        print('Grid 2: ')
         print('-*-'*self.kdim**2)
         for k in self.grid_2:
             print(k)
@@ -151,9 +158,13 @@ class Solver:
 
     def print_solution(self):
         
+        print('Solution of grid 1: ')
         print('-*-'*self.kdim**2)
         for k in self.solution_1:
             print(k)
+        print('-*-'*self.kdim**2)
+        print()
+        print('Solution of grid 2: ')
         print('-*-'*self.kdim**2)
         for k in self.solution_2:
             print(k)
@@ -162,14 +173,12 @@ class Solver:
     def add_solution_clauses(self):
 
         sol_clause = []
-        # clause_2 = []
         for i in range(1, self.kdim**2+1):
             for j in range(1, self.kdim**2+1):
                 sol_clause.append(-1*self.encode(0, i, j, self.solution_1[i-1][j-1]))
                 sol_clause.append(-1*self.encode(1, i, j, self.solution_2[i-1][j-1]))
 
         self.clauses.append(sol_clause)
-        # print(f'The length of clauses are : {len(self.clauses)}\n')
 
     def _validate(self, i):
 
@@ -220,14 +229,20 @@ class Solver:
 
         first = self._validate(0)
         second = self._validate(1)
+        p_1 = 'Solution 1 is correct' if first else 'Solution 1 is wrong'
+        p_2 = 'Solution 2 is correct' if second else 'Solution 2 is wrong'
+        print(p_1)
+        print(p_2)
+        print('-'*50)
 
-        if first:
-            print('First solution is correct')
-        else:
-            print('First solution is wrong')
+    def print_grid_to_csv(self):
 
-        if second:
-            print('Second solution is correct')
-        else:
-            print('Second solution is wrong')
+        combined = np.concatenate((np.array(self.grid_1), np.array(self.grid_2)), axis=0)
+        pd.DataFrame(combined).to_csv(f'{self.file_name}', header=None, index=None, line_terminator='\n')
+    
+    def print_solution_to_csv(self):
+
+        combined = np.concatenate((np.array(self.solution_1), np.array(self.solution_2)), axis=0)
+        pd.DataFrame(combined).to_csv(f'{self.file_name}', header=None, index=None, line_terminator='\n')
+
 

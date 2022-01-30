@@ -7,15 +7,17 @@ import random
 
 start_time = time.time()
 ap = argparse.ArgumentParser()
-ap.add_argument('-k', '--kdim', help='Value of k')
+ap.add_argument('-k', '--kdim', required=True, help='Value of k')
+ap.add_argument('-o', '--output_file', required=True, help='Name of the csv file to dump the results')
 args = vars(ap.parse_args())
 
 kdim = int(args['kdim'])
+file_name = args['output_file']
 
 grid_1 = np.zeros((kdim**2, kdim**2)).tolist()
 grid_2 = np.zeros((kdim**2, kdim**2)).tolist()
 
-solver = Solver(kdim, grid_1, grid_2)
+solver = Solver(kdim, grid_1, grid_2, file_name)
 solver.get_clauses()
 
 # Generate the sudoku
@@ -23,6 +25,8 @@ solver.solve()
 solver.set_grid()
 solver.add_solution_clauses()
 solver.print_grid()
+print('-'*100)
+print()
 
 def random_generate():
     random.seed(random.randint(1, 1e6))
@@ -81,5 +85,6 @@ for _ in range(kdim**4):
 #     if number_sol == 2:
 #         break
 
+solver.print_grid_to_csv()
 end_time = time.time()
 print(f'Time taken: {end_time-start_time}')
