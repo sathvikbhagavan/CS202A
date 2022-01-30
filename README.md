@@ -1,6 +1,6 @@
 # CS202A
 
-There are some prerequisites for running this code:  numpy, pandas, pysat
+Prerequisite modules for running the code:  numpy, pandas, python-sat
 
 ## Our versions:
 
@@ -11,9 +11,12 @@ pandas 1.4.0
 python-sat 0.1.7
 
 
-## Q1. For running the script, there are two command line arguments required:
+## Q1 Sudoku solver
+
+### For running the script, there are two command line arguments required:
 
 -k or --kdim: The value of k
+
 
 -f or --file: The location of the csv file
 
@@ -22,10 +25,12 @@ python-sat 0.1.7
 
 ### Example run will be:
 
-python3 sudoku_pair.py -k 3 -f test/test_1.csv
+python3 sudoku_pair.py -k 3 -f tests/test_1.csv
 
 
-## Q2. For running the script, there are two command line arguments required:
+## Q2 Sudoku Generation
+
+### For running the script, there are two command line arguments required:
 
 -k or --kdim: The value of k
 
