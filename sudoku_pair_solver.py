@@ -39,7 +39,6 @@ class Solver:
         clauses = []
 
         # Each cell has atleast one number
-        individual_clauses_1 = []
         for i in range(1, self.kdim**2+1):
             for j in range(1, self.kdim**2+1):
                 individual_clause = []
@@ -49,7 +48,6 @@ class Solver:
 
         
         # Each cell has atmost one number
-        individual_clauses_2 = []
         for i in range(1, self.kdim**2+1):
             for j in range(1, self.kdim**2+1):
                 for k1 in range(1, self.kdim**2+1):
@@ -58,25 +56,21 @@ class Solver:
         
 
         # Each row has every number
-        row_clauses = []
         for j in range(1, self.kdim**2+1):
             for i in range(1, self.kdim**2+1):
                 for i2 in range(i+1, self.kdim**2+1):
                     for k in range(1, self.kdim**2+1):
                         clauses.append([-1*self.encode(g, i, j, k), -1*self.encode(g, i2, j, k)])
         
-
+        
         # Each column has every number
-        col_clauses = []
         for i in range(1, self.kdim**2+1):
             for j in range(1, self.kdim**2+1):
                 for j2  in range(j+1, self.kdim**2+1):
                     for k in range(1, self.kdim**2+1):
                         clauses.append([-1*self.encode(g, i, j, k), -1*self.encode(g, i, j2, k)])
 
-
         # Subgrids
-        subgrid_clauses = []
         for r in range(self.kdim):
             for s in range(self.kdim):
                 for k in range(1, self.kdim**2+1):
@@ -113,15 +107,13 @@ class Solver:
         self.clauses_2 = self.get_individual_clauses(1)
         self.clauses = self.clauses_1 + self.clauses_2
         self.get_inter_clauses()
-        self.clauses_= copy.deepcopy(self.clauses)
-
         self.get_fixed_clauses()
     
-    def get_clauses_updated(self):
+    def get_clauses_updated(self, pos_x_1, pos_y_1, prev_1, pos_x_2, pos_y_2, prev_2):
 
-        self.clauses = copy.deepcopy(self.clauses_)
-        self.get_fixed_clauses()
-        self.add_solution_clauses()
+        self.clauses.remove([self.encode(0, pos_x_1, pos_y_1, prev_1)])
+        self.clauses.remove([self.encode(1, pos_x_2, pos_y_2, prev_2)])
+
 
     def solve(self):
         

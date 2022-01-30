@@ -20,16 +20,15 @@ grid_2 = np.zeros((kdim**2, kdim**2)).tolist()
 solver = Solver(kdim, grid_1, grid_2, file_name)
 solver.get_clauses()
 
-# Generate the sudoku
 solver.solve()
 solver.set_grid()
 solver.add_solution_clauses()
+solver.get_fixed_clauses()
 solver.print_grid()
 print('-'*100)
 print()
 
 def random_generate():
-    random.seed(random.randint(1, 1e6))
     pos_x = random.randint(1, kdim**2)
     pos_y = random.randint(1, kdim**2)
     return pos_x, pos_y
@@ -54,8 +53,9 @@ for _ in range(kdim**4):
     prev_2 = solver.grid_2[pos_x_2-1][pos_y_2-1]
     solver.grid_2[pos_x_2-1][pos_y_2-1] = 0
 
-    # Remove the two fixed clauses
-    solver.get_clauses_updated()
+    print(f'Zeros made: {count}')
+    
+    solver.get_clauses_updated(pos_x_1, pos_y_1, prev_1, pos_x_2, pos_y_2, prev_2)
     number_sol = 0
     
     while True:
@@ -71,19 +71,6 @@ for _ in range(kdim**4):
 
     if done:
         break        
-
-# number_sol = 0
-# solver.get_clauses_updated()
-# while True:
-#     print(number_sol)
-#     x = solver.solve()
-#     solver.print_solution()
-#     if not x:
-#         break
-#     solver.add_solution_clauses()
-#     number_sol += 1
-#     if number_sol == 2:
-#         break
 
 solver.print_grid_to_csv()
 end_time = time.time()

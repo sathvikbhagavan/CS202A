@@ -2,7 +2,9 @@ from sudoku_pair_solver import *
 import argparse
 import numpy
 import pandas as pd
+import time
 
+start_time = time.time()
 ap = argparse.ArgumentParser()
 ap.add_argument('-k', '--kdim', required=True, help='Value of k')
 ap.add_argument('-f', '--file', required=True, help='CSV file')
@@ -28,3 +30,5 @@ if not is_sol:
 solver.print_solution()
 if file_name is not None:
     solver.print_solution_to_csv()
+end_time = time.time()
+print(f'Time taken: {end_time-start_time}')
