@@ -14,7 +14,9 @@ python-sat 0.1.7
 Q1. For running the script, there are two command line arguments required:
 
 -k or --kdim: The value of k
+
 -f or --file: The location of the csv file
+
 
 -o or --output_file: Optional, The location of the csv file to dump the output
 
@@ -27,7 +29,7 @@ Q2. For running the script, there are two command line arguments required:
 
 -k or --kdim: The value of k
 
--o or --output_file: Optional, The location of the csv file to dump the output
+-o or --output_file: The location of the csv file to dump the output
 
 Example run will be
 
