@@ -25,7 +25,7 @@ python-sat 0.1.7
 
 ### Example run will be:
 
-python3 sudoku_pair.py -k 3 -f tests/test_1.csv
+python3 solve_sudoku_pair.py -k 3 -f tests/test_1.csv
 
 
 ## Q2 Sudoku Generation
@@ -38,4 +38,4 @@ python3 sudoku_pair.py -k 3 -f tests/test_1.csv
 
 ### Example run will be
 
-python3 generate_solutions.py -k 2 -o solution_1.csv
+python3 generate_sudoku_pair.py -k 2 -o solution_2.csv
