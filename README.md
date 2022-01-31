@@ -38,4 +38,4 @@ python3 solve_sudoku_pair.py -k 3 -f tests/test_1.csv
 
 ### Example run will be
 
-python3 generate_sudoku_pair.py -k 2 -o solution_2.csv
+python3 generate_sudoku_pair.py -k 2 -o tests/test_2.csv
