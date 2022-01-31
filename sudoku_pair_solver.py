@@ -4,6 +4,25 @@ import numpy as np
 import pandas as pd
 
 class Solver:
+    """
+    This is a class used for solving sudoku pair using sat solver(Minisat22)
+
+    Attributes:
+        k (int) - size of the subgrid in the sudoku
+        grid_1 (list of list) - first sudoku
+        grid_2 (list of list) - second sudoku
+        clauses_1 (list of list) - clauses for the first sudoku
+        clauses_2 (list of list) - clauses for the second sudoku
+        clauses (list of list) - clauses for the sudoku pair
+        solver (Minisat object) - sat solver used for solving the sudoku pair
+        solution (list) - solution returned by the sat solver
+        solution_1 (list of list) - solution of first sudoku which can used for printing on screen 
+                                    or write to a csv file 
+        solution_2 (list of list) - solution of second sudoku which can used for printing on screen 
+                                    or write to a csv file
+        filename (str) - name of the csv file for writing the solution
+    """
+
     def __init__(self, kdim, grid_1, grid_2, file_name=None):
         self.kdim = kdim
         self.grid_1 = grid_1
@@ -11,17 +30,18 @@ class Solver:
         self.clauses_1 = []
         self.clauses = []
         self.clauses_2 = []
-        self.clauses_ = None
         self.solver = None
         self.solution = None
         self.solution_1 = copy.deepcopy(self.grid_1)
         self.solution_2 = copy.deepcopy(self.grid_2)
         self.file_name = file_name
     
+
     # Encoding the position in the sudoku to a number
     def encode(self, g, i, j, k):
         return (self.kdim**6)*g + (self.kdim**4)*(i-1) + (self.kdim**2)*(j-1) + k
     
+
     # Decoding the position in the sudoku to a number
     def decode(self, i):
         i -= 1
@@ -31,6 +51,7 @@ class Solver:
         y = num//(self.kdim**2)
         num = num % (self.kdim**2)
         return x, y, num+1
+
 
     # Method to get the subgrid a cell belongs to
     def get_subgrid(self, i, j):
@@ -105,6 +126,7 @@ class Solver:
                 if self.grid_2[i-1][j-1] != 0:
                     self.clauses.append([self.encode(1, i, j, self.grid_2[i-1][j-1])])
 
+
     # Method to collect all clauses
     def get_clauses(self):
 
@@ -114,6 +136,7 @@ class Solver:
         self.get_inter_clauses()
         self.get_fixed_clauses()
     
+
     # Method to update clauses (required for generation)
     def get_clauses_updated(self, pos_x_1, pos_y_1, prev_1, pos_x_2, pos_y_2, prev_2):
 
@@ -121,6 +144,7 @@ class Solver:
         self.clauses.remove([self.encode(1, pos_x_2, pos_y_2, prev_2)])
 
 
+    # Method to solve the sudoku pair
     def solve(self):
         
         with Minisat22(bootstrap_with=self.clauses) as self.solver:
@@ -138,6 +162,7 @@ class Solver:
             return True
 
 
+    # Method to print the input grid of sudoku pair
     def print_grid(self):
 
         print('Grid 1: ')
@@ -163,6 +188,7 @@ class Solver:
         print('-'*4*self.kdim**2)
         
     
+    # Method to print the solution of sudoku pair
     def print_solution(self):
         
         print('Solution of grid 1: ')
@@ -187,6 +213,7 @@ class Solver:
             print()
         print('-'*4*self.kdim**2)
 
+    
     # Method to add solution clauses for checking non unique solution
     def add_solution_clauses(self):
 
@@ -198,6 +225,7 @@ class Solver:
 
         self.clauses.append(sol_clause)
 
+    
     # To check whether the solution is correct or not
     def _validate(self, i):
 
@@ -237,6 +265,8 @@ class Solver:
         
         return True
 
+
+    # Method to copy solution into grid (required for generation)
     def set_grid(self):
 
         for i in range(1, self.kdim**2+1):
@@ -244,6 +274,8 @@ class Solver:
                 self.grid_1[i-1][j-1] = self.solution_1[i-1][j-1]
                 self.grid_2[i-1][j-1] = self.solution_2[i-1][j-1]
 
+
+    # Method to invoke _validate for both sudokus in the sudoku pair
     def validate(self):
 
         first = self._validate(0)
@@ -254,14 +286,16 @@ class Solver:
         print(p_2)
         print('-'*4*self.kdim**2)
 
+
+    # Method to write grids into csv file
     def print_grid_to_csv(self):
 
         combined = np.concatenate((np.array(self.grid_1), np.array(self.grid_2)), axis=0)
         pd.DataFrame(combined).to_csv(f'{self.file_name}', header=None, index=None, line_terminator='\n')
     
+
+    # Method to write solutions into csv file
     def print_solution_to_csv(self):
 
         combined = np.concatenate((np.array(self.solution_1), np.array(self.solution_2)), axis=0)
         pd.DataFrame(combined).to_csv(f'{self.file_name}', header=None, index=None, line_terminator='\n')
-
-
