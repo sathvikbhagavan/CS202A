@@ -266,6 +266,16 @@ class Solver:
         return True
 
 
+    def _cross_validate(self):
+
+        for i in range(1, self.kdim**2+1):
+            for j in range(1, self.kdim**2+1):
+                if self.solution_1[i-1][j-1] == self.solution_2[i-1][j-1]:
+                    return False
+        
+        return True
+                
+
     # Method to copy solution into grid (required for generation)
     def set_grid(self):
 
@@ -280,10 +290,14 @@ class Solver:
 
         first = self._validate(0)
         second = self._validate(1)
-        p_1 = 'Solution 1 is correct' if first else 'Solution 1 is wrong'
-        p_2 = 'Solution 2 is correct' if second else 'Solution 2 is wrong'
-        print(p_1)
-        print(p_2)
+        cross = self._cross_validate()
+        if not cross:
+            print('Solutions are wrong!')
+        else:
+            p_1 = 'Solution 1 is correct!' if first else 'Solution 1 is wrong!'
+            p_2 = 'Solution 2 is correct!' if second else 'Solution 2 is wrong!'
+            print(p_1)
+            print(p_2)
         print('-'*4*self.kdim**2)
 
 
