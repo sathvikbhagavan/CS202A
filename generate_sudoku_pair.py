@@ -4,7 +4,6 @@ import time
 from sudoku_pair_solver import *
 import random
 
-
 start_time = time.time()
 ap = argparse.ArgumentParser()
 ap.add_argument('-k', '--kdim', required=True, help='Value of k')
@@ -19,13 +18,12 @@ grid_2 = np.zeros((kdim**2, kdim**2)).tolist()
 
 solver = Solver(kdim, grid_1, grid_2, file_name)
 solver.get_clauses()
-
 solver.solve()
 solver.set_grid()
+        
 solver.add_solution_clauses()
 solver.get_fixed_clauses()
 solver.print_grid()
-print('-'*100)
 print()
 
 def random_generate():
@@ -69,7 +67,6 @@ for _ in range(kdim**4):
             print(f'Number of zeros : {count}')
             done = True
             break
-
     if done:
         break        
 

@@ -27,7 +27,8 @@ solver.get_clauses()
 is_sol = solver.solve()
 if not is_sol:
     print(None)
-solver.print_solution()
+else:
+    solver.print_solution()
 if file_name is not None:
     solver.print_solution_to_csv()
 end_time = time.time()

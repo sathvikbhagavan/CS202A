@@ -1,8 +1,10 @@
+from operator import delitem
 from pysat.solvers import Minisat22
 import copy
 import itertools
 import numpy as np
 import pandas as pd
+import gc
 
 class Solver:
     def __init__(self, kdim, grid_1, grid_2, file_name=None):
@@ -117,50 +119,69 @@ class Solver:
 
     def solve(self):
         
-        self.solver = Minisat22(use_timer=True, bootstrap_with=self.clauses)
-        self.solver.solve()
-        self.solution = self.solver.get_model()
-        if self.solution is None:
-            return False
-        for i in self.solution:
-            if i > 0 and i <= (self.kdim**6):
-                x, y, num = self.decode(i)
-                self.solution_1[x][y] = num
-            elif i > 0 and i > (self.kdim**6):
-                x, y, num = self.decode(i)
-                self.solution_2[x][y] = num
-        self.solver.delete()
-        return True
+        with Minisat22(bootstrap_with=self.clauses) as self.solver:
+            self.solver.solve()
+            self.solution = self.solver.get_model()
+            if self.solution is None:
+                return False
+            for i in self.solution:
+                if i > 0 and i <= (self.kdim**6):
+                    x, y, num = self.decode(i)
+                    self.solution_1[x][y] = num
+                elif i > 0 and i > (self.kdim**6):
+                    x, y, num = self.decode(i)
+                    self.solution_2[x][y] = num
+            return True
 
 
     def print_grid(self):
 
         print('Grid 1: ')
-        print('-*-'*self.kdim**2)
+        print('-'*4*self.kdim**2)
         for k in self.grid_1:
-            print(k)
-        print('-*-'*self.kdim**2)
+            for j in k:
+                if j < 10:
+                    print(f' {j} ', end=' ')
+                else:
+                    print(f' {j}', end=' ')
+            print()
+        print('-'*4*self.kdim**2)
         print()
         print('Grid 2: ')
-        print('-*-'*self.kdim**2)
+        print('-'*4*self.kdim**2)
         for k in self.grid_2:
-            print(k)
-        print('-*-'*self.kdim**2)
+            for j in k:
+                if j < 10:
+                    print(f' {j} ', end=' ')
+                else:
+                    print(f' {j}', end=' ')
+            print()
+        print('-'*4*self.kdim**2)
         
 
     def print_solution(self):
         
         print('Solution of grid 1: ')
-        print('-*-'*self.kdim**2)
+        print('-'*4*self.kdim**2)
         for k in self.solution_1:
-            print(k)
-        print('-*-'*self.kdim**2)
+            for j in k:
+                if j < 10:
+                    print(f' {j} ', end=' ')
+                else:
+                    print(f' {j}', end=' ')
+            print()
+        print('-'*4*self.kdim**2)
         print()
         print('Solution of grid 2: ')
-        print('-*-'*self.kdim**2)
+        print('-'*4*self.kdim**2)
         for k in self.solution_2:
-            print(k)
-        print('-*-'*self.kdim**2)
+            for j in k:
+                if j < 10:
+                    print(f' {j} ', end=' ')
+                else:
+                    print(f' {j}', end=' ')
+            print()
+        print('-'*4*self.kdim**2)
 
     def add_solution_clauses(self):
 
@@ -225,7 +246,7 @@ class Solver:
         p_2 = 'Solution 2 is correct' if second else 'Solution 2 is wrong'
         print(p_1)
         print(p_2)
-        print('-'*50)
+        print('-'*4*self.kdim**2)
 
     def print_grid_to_csv(self):
 
