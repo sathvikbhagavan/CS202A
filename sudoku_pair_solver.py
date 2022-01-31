@@ -107,7 +107,7 @@ class Solver:
         return clauses
 
 
-    # Clauses for the constraints between the two sudoku
+    # Clauses for the constraints between two sudokus
     def get_inter_clauses(self):
 
         for i in range(1, self.kdim**2+1):
@@ -162,7 +162,7 @@ class Solver:
             return True
 
 
-    # Method to print the input grid of sudoku pair
+    # Method to print input grid of sudoku pair
     def print_grid(self):
 
         print('Grid 1: ')
@@ -188,7 +188,7 @@ class Solver:
         print('-'*4*self.kdim**2)
         
     
-    # Method to print the solution of sudoku pair
+    # Method to print solution of sudoku pair
     def print_solution(self):
         
         print('Solution of grid 1: ')
@@ -226,7 +226,7 @@ class Solver:
         self.clauses.append(sol_clause)
 
     
-    # To check whether the solution is correct or not
+    # Method to check whether the solution is correct or not
     def _validate(self, i):
 
         solution = self.solution_1 if i == 0 else self.solution_2
