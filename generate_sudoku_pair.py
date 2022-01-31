@@ -19,10 +19,6 @@ grid_2 = np.zeros((kdim**2, kdim**2)).tolist()
 solver = Solver(kdim, grid_1, grid_2, file_name)
 solver.get_clauses()
 solver.solve()
-for i in range(1, kdim**2+1):
-    for j in range(1, kdim**2+1):
-        solver.solution_1[i-1][j-1] = (solver.solution_1[i-1][j-1])%(kdim**2) + 1
-        solver.solution_2[i-1][j-1] = (solver.solution_2[i-1][j-1])%(kdim**2) + 1
 solver.set_grid()
 
 solver.add_solution_clauses()
