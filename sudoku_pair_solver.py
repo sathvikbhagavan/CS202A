@@ -294,10 +294,10 @@ class Solver:
         if not cross:
             print('Solutions are wrong!')
         else:
-            p_1 = 'Solution 1 is correct!' if first else 'Solution 1 is wrong!'
-            p_2 = 'Solution 2 is correct!' if second else 'Solution 2 is wrong!'
-            print(p_1)
-            print(p_2)
+            if first and second:
+                print('Solutions are correct!')
+            else:
+                print('Solutions are wrong!')
         print('-'*4*self.kdim**2)
 
 
