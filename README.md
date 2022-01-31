@@ -25,7 +25,7 @@ python-sat 0.1.7
 
 ### Example run will be:
 
-python3 solve_sudoku_pair.py -k 3 -f tests/test_2_1.csv
+python3 solve_sudoku_pair.py -k 2 -f tests/test_2_1.csv
 
 
 ## Q2 Sudoku Pair Generator
