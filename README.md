@@ -1,4 +1,4 @@
-# CS202A
+# CS202A Assignment 1
 
 Prerequisite modules for running the code:  numpy, pandas, python-sat
 
