@@ -1,10 +1,7 @@
-from operator import delitem
 from pysat.solvers import Minisat22
 import copy
-import itertools
 import numpy as np
 import pandas as pd
-import gc
 
 class Solver:
     def __init__(self, kdim, grid_1, grid_2, file_name=None):
@@ -21,9 +18,11 @@ class Solver:
         self.solution_2 = copy.deepcopy(self.grid_2)
         self.file_name = file_name
     
+    # Encoding the position in the sudoku to a number
     def encode(self, g, i, j, k):
         return (self.kdim**6)*g + (self.kdim**4)*(i-1) + (self.kdim**2)*(j-1) + k
     
+    # Decoding the position in the sudoku to a number
     def decode(self, i):
         i -= 1
         num = i%(self.kdim**6)
@@ -33,10 +32,12 @@ class Solver:
         num = num % (self.kdim**2)
         return x, y, num+1
 
+    # Method to get the subgrid a cell belongs to
     def get_subgrid(self, i, j):
         return [(i-1)//self.kdim, (j-1)//self.kdim]
 
     
+    # Get clauses for one sudoku
     def get_individual_clauses(self, g):
         clauses = []
 
@@ -85,6 +86,7 @@ class Solver:
         return clauses
 
 
+    # Clauses for the constraints between the two sudoku
     def get_inter_clauses(self):
 
         for i in range(1, self.kdim**2+1):
@@ -93,7 +95,7 @@ class Solver:
                     self.clauses.append([-1*self.encode(0, i, j, k), -1*self.encode(1, i, j, k)])
 
 
-    
+    # Clauses for numbers fixed in the sudoku
     def get_fixed_clauses(self):
 
         for i in range(1, self.kdim**2+1):
@@ -103,6 +105,7 @@ class Solver:
                 if self.grid_2[i-1][j-1] != 0:
                     self.clauses.append([self.encode(1, i, j, self.grid_2[i-1][j-1])])
 
+    # Method to collect all clauses
     def get_clauses(self):
 
         self.clauses_1 = self.get_individual_clauses(0)
@@ -111,6 +114,7 @@ class Solver:
         self.get_inter_clauses()
         self.get_fixed_clauses()
     
+    # Method to update clauses (required for generation)
     def get_clauses_updated(self, pos_x_1, pos_y_1, prev_1, pos_x_2, pos_y_2, prev_2):
 
         self.clauses.remove([self.encode(0, pos_x_1, pos_y_1, prev_1)])
@@ -158,7 +162,7 @@ class Solver:
             print()
         print('-'*4*self.kdim**2)
         
-
+    
     def print_solution(self):
         
         print('Solution of grid 1: ')
@@ -183,6 +187,7 @@ class Solver:
             print()
         print('-'*4*self.kdim**2)
 
+    # Method to add solution clauses for checking non unique solution
     def add_solution_clauses(self):
 
         sol_clause = []
@@ -193,6 +198,7 @@ class Solver:
 
         self.clauses.append(sol_clause)
 
+    # To check whether the solution is correct or not
     def _validate(self, i):
 
         solution = self.solution_1 if i == 0 else self.solution_2

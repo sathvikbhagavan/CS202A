@@ -29,7 +29,7 @@ if not is_sol:
     print(None)
 else:
     solver.print_solution()
-if file_name is not None:
-    solver.print_solution_to_csv()
+    if file_name is not None:
+        solver.print_solution_to_csv()
 end_time = time.time()
 print(f'Time taken: {end_time-start_time}')
