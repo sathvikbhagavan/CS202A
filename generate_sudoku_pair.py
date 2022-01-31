@@ -48,7 +48,6 @@ solver.print_grid()
 print()
 
 
-
 done = False
 count = 0
 for _ in range(kdim**4):
