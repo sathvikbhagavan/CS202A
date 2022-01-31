@@ -64,6 +64,7 @@ for _ in range(kdim**4):
         else:
             solver.grid_1[pos_x_1-1][pos_y_1-1] = prev_1
             solver.grid_2[pos_x_2-1][pos_y_2-1] = prev_2
+            print()
             solver.print_grid()
             print(f'Number of zeros : {count}')
             done = True

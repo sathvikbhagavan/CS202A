@@ -129,7 +129,7 @@ class Solver:
             elif i > 0 and i > (self.kdim**6):
                 x, y, num = self.decode(i)
                 self.solution_2[x][y] = num
-
+        self.solver.delete()
         return True
 
 
