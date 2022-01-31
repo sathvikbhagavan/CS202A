@@ -11,7 +11,7 @@ pandas 1.4.0
 python-sat 0.1.7
 
 
-## Q1 Sudoku solver
+## Q1 Sudoku Pair Solver
 
 ### For running the script, there are two command line arguments required:
 
@@ -28,7 +28,7 @@ python-sat 0.1.7
 python3 solve_sudoku_pair.py -k 3 -f tests/test_1.csv
 
 
-## Q2 Sudoku Generation
+## Q2 Sudoku Pair Generator
 
 ### For running the script, there are two command line arguments required:
 
