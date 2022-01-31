@@ -60,17 +60,14 @@ for _ in range(kdim**4):
     solver.get_clauses_updated(pos_x_1, pos_y_1, prev_1, pos_x_2, pos_y_2, prev_2)
     number_sol = 0
     
-    while True:
-        if not solver.solve():
-            break
-        else:
-            solver.grid_1[pos_x_1-1][pos_y_1-1] = prev_1
-            solver.grid_2[pos_x_2-1][pos_y_2-1] = prev_2
-            print()
-            solver.print_grid()
-            print(f'Number of zeros : {count}')
-            done = True
-            break
+    if solver.solve():
+        solver.grid_1[pos_x_1-1][pos_y_1-1] = prev_1
+        solver.grid_2[pos_x_2-1][pos_y_2-1] = prev_2
+        print()
+        solver.print_grid()
+        print(f'Number of zeros : {count}')
+        done = True
+    
     if done:
         break        
 
