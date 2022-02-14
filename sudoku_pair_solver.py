@@ -139,7 +139,7 @@ class Solver:
 
     # Method to update clauses (required for generation)
     def get_clauses_updated(self, pos_x_1, pos_y_1, prev_1, pos_x_2, pos_y_2, prev_2):
-
+        
         self.clauses.remove([self.encode(0, pos_x_1, pos_y_1, prev_1)])
         self.clauses.remove([self.encode(1, pos_x_2, pos_y_2, prev_2)])
 

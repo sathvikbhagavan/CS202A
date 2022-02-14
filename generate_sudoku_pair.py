@@ -34,11 +34,13 @@ num_2 = random.randint(1, kdim**2)
 grid_1 = np.zeros((kdim**2, kdim**2)).tolist()
 grid_2 = np.zeros((kdim**2, kdim**2)).tolist()
 
-grid_1[i_x_1-1][i_y_1-1] = num_1
-grid_2[i_x_2-1][i_y_2-1] = num_2
 
 solver = Solver(kdim, grid_1, grid_2, file_name)
 solver.get_clauses()
+
+grid_1[i_x_1-1][i_y_1-1] = num_1
+grid_2[i_x_2-1][i_y_2-1] = num_2
+
 solver.solve()
 solver.set_grid()
 
@@ -69,16 +71,17 @@ for _ in range(kdim**4):
     solver.grid_2[pos_x_2-1][pos_y_2-1] = 0
 
     print(f'Zeros made: {count}')
-    
+
     solver.get_clauses_updated(pos_x_1, pos_y_1, prev_1, pos_x_2, pos_y_2, prev_2)
-    number_sol = 0
+
+    x = solver.solve()
     
-    if solver.solve():
+    if x:
+        print()
         solver.grid_1[pos_x_1-1][pos_y_1-1] = prev_1
         solver.grid_2[pos_x_2-1][pos_y_2-1] = prev_2
-        print()
         solver.print_grid()
-        print(f'Number of zeros : {count}')
+        print(f'Number of zeros : {count-1}')
         done = True
     
     if done:
